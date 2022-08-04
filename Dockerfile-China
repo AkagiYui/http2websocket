@@ -1,0 +1,19 @@
+FROM python:3.9-slim
+COPY ./src /app
+
+# 设置时区
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+&& dpkg-reconfigure -f noninteractive tzdata \
+# 配置pip国内源
+&& pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
+# 安装依赖
+&& pip --no-cache-dir install --upgrade pip \
+&& pip --no-cache-dir install wheel \
+&& pip --no-cache-dir install fastapi[all] \
+# 清理缓存
+&& rm -rf ~/.cache/pip
+
+EXPOSE 80
+
+WORKDIR /app
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
